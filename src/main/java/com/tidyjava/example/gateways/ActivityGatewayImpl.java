@@ -2,55 +2,55 @@ package com.tidyjava.example.gateways;
 
 import com.tidyjava.example.callback.Callback;
 import com.tidyjava.example.entities.Activity;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.SQLConnection;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class ActivityGatewayImpl implements ActivityGateway {
-    private final Vertx vertx;
+    private JDBCClient jdbcClient;
 
     @Inject
-    public ActivityGatewayImpl(Vertx vertx) {
-        this.vertx = vertx;
+    public ActivityGatewayImpl(JDBCClient jdbcClient) {
+        this.jdbcClient = jdbcClient;
     }
 
     @Override
     public void findAll(Callback<List<Activity>> callback) {
-        JsonObject config = new JsonObject()
-                .put("url", "jdbc:h2:mem:test")
-                .put("driver_class", "org.h2.Driver");
+        getConnection(connection -> connection.query("SELECT * FROM Activities;", asyncRs -> {
+            if (asyncRs.succeeded()) {
+                List<Activity> activities = asyncRs.result()
+                        .getRows()
+                        .stream()
+                        .map(this::toActivity).collect(Collectors.toList());
 
-        JDBCClient client = JDBCClient.createShared(vertx, config);
+                callback.success(activities);
+            } else {
+                callback.failure(asyncRs.cause());
+            }
+        }), callback);
+    }
 
-        client.getConnection(res -> {
-            if (res.succeeded()) {
-                SQLConnection connection = res.result();
-                connection.query("SELECT * FROM Activities;", res2 -> {
-                    if (res2.succeeded()) {
-                        List<JsonObject> rows = res2.result().getRows();
-
-                        List<Activity> results = new ArrayList<>();
-                        for (JsonObject row : rows) {
-                            Activity activity = new Activity();
-                            activity.setId(row.getString("ID"));
-                            activity.setName(row.getString("NAME"));
-                            results.add(activity);
-                        }
-
-                        callback.success(results);
-                    } else {
-                        callback.failure(res2.cause());
-                    }
-                });
+    private void getConnection(Consumer<SQLConnection> sqlConnectionConsumer, Callback<List<Activity>> callback) {
+        jdbcClient.getConnection(asyncConn -> {
+            if (asyncConn.succeeded()) {
+                SQLConnection connection = asyncConn.result();
+                sqlConnectionConsumer.accept(connection);
                 connection.close();
             } else {
-                callback.failure(res.cause());
+                callback.failure(asyncConn.cause());
             }
         });
+    }
+
+    private Activity toActivity(JsonObject row) {
+        Activity activity = new Activity();
+        activity.setId(row.getString("ID"));
+        activity.setName(row.getString("NAME"));
+        return activity;
     }
 }

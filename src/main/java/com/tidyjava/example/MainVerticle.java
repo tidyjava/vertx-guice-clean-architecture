@@ -3,10 +3,9 @@ package com.tidyjava.example;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.tidyjava.example.usecases.listActivities.ListActivitiesInputBoundary;
-import com.tidyjava.example.usecases.listActivities.ListActivitiesUseCase;
 import com.tidyjava.example.usecases.listActivities.ListActivitiesPresenter;
+import com.tidyjava.example.usecases.listActivities.ListActivitiesUseCase;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.web.Router;
@@ -18,10 +17,10 @@ public class MainVerticle extends AbstractVerticle {
     public void start() {
         initDatabase();
 
-        Injector injector = Guice.createInjector(new ActivityModule(vertx));
+        Injector injector = Guice.createInjector(new ActivityModule(vertx, config()));
         ListActivitiesInputBoundary listActivitiesUseCase = injector.getInstance(ListActivitiesUseCase.class);
 
-        final Router router = Router.router(vertx);
+        Router router = Router.router(vertx);
 
         router.get().handler(ctx -> {
             ListActivitiesPresenter presenter = new ListActivitiesPresenter(ctx);
@@ -45,11 +44,7 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     private void initDatabase() {
-        JsonObject config = new JsonObject()
-                .put("url", "jdbc:h2:mem:test")
-                .put("driver_class", "org.h2.Driver");
-
-        JDBCClient client = JDBCClient.createShared(vertx, config);
+        JDBCClient client = JDBCClient.createShared(vertx, config());
 
         client.getConnection(res -> {
             if (res.succeeded()) {
