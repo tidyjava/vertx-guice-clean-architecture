@@ -3,7 +3,6 @@ package com.tidyjava.example;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.tidyjava.example.usecases.listActivities.ListActivitiesInputBoundary;
-import com.tidyjava.example.usecases.listActivities.ListActivitiesModule;
 import com.tidyjava.example.usecases.listActivities.ListActivitiesUseCase;
 import com.tidyjava.example.usecases.listActivities.ListActivitiesPresenter;
 import io.vertx.core.AbstractVerticle;
@@ -19,7 +18,7 @@ public class MainVerticle extends AbstractVerticle {
     public void start() {
         initDatabase();
 
-        Injector injector = Guice.createInjector(new ListActivitiesModule(vertx));
+        Injector injector = Guice.createInjector(new ActivityModule(vertx));
         ListActivitiesInputBoundary listActivitiesUseCase = injector.getInstance(ListActivitiesUseCase.class);
 
         final Router router = Router.router(vertx);

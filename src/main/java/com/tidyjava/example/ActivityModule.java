@@ -1,14 +1,16 @@
-package com.tidyjava.example.usecases.listActivities;
+package com.tidyjava.example;
 
 import com.google.inject.AbstractModule;
 import com.tidyjava.example.gateways.ActivityGateway;
 import com.tidyjava.example.gateways.ActivityGatewayImpl;
+import com.tidyjava.example.usecases.listActivities.ListActivitiesInputBoundary;
+import com.tidyjava.example.usecases.listActivities.ListActivitiesUseCase;
 import io.vertx.core.Vertx;
 
-public class ListActivitiesModule extends AbstractModule {
+public class ActivityModule extends AbstractModule {
     private final Vertx vertx;
 
-    public ListActivitiesModule(Vertx vertx) {
+    public ActivityModule(Vertx vertx) {
         this.vertx = vertx;
     }
 
