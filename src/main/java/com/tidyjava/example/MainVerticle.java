@@ -2,15 +2,14 @@ package com.tidyjava.example;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.tidyjava.example.usecases.listActivities.ListActivitiesController;
-import com.tidyjava.example.usecases.listActivities.ListActivitiesModule;
-import com.tidyjava.example.usecases.listActivities.ListActivitiesView;
-import com.tidyjava.example.usecases.listActivities.ListActivitiesViewImpl;
+import com.tidyjava.example.callback.Callback;
+import com.tidyjava.example.usecases.listActivities.*;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.templ.FreeMarkerTemplateEngine;
 
 public class MainVerticle extends AbstractVerticle {
 
@@ -19,13 +18,24 @@ public class MainVerticle extends AbstractVerticle {
         initDatabase();
 
         Injector injector = Guice.createInjector(new ListActivitiesModule(vertx));
-        ListActivitiesController listActivitiesController = injector.getInstance(ListActivitiesController.class);
+        ListActivitiesInputBoundary listActivitiesUseCase = injector.getInstance(ListActivitiesUseCase.class);
 
         final Router router = Router.router(vertx);
 
         router.get().handler(ctx -> {
             ListActivitiesView listActivitiesView = new ListActivitiesViewImpl(ctx);
-            listActivitiesController.handle(listActivitiesView);
+            listActivitiesUseCase.listActivities(Callback.of(listActivitiesView::generate, ctx::fail));
+        }).failureHandler(ctx -> {
+            FreeMarkerTemplateEngine engine = FreeMarkerTemplateEngine.create();
+
+            engine.render(ctx, "templates/error.ftl", res -> {
+                if (res.succeeded()) {
+                    ctx.response().end(res.result());
+                } else {
+                    System.out.println("DUPA");
+                    ctx.fail(res.cause());
+                }
+            });
         });
 
         vertx.createHttpServer()

@@ -20,7 +20,5 @@ public class ListActivitiesModule extends AbstractModule {
             .to(ActivityGatewayImpl.class);
         bind(ListActivitiesInputBoundary.class)
             .to(ListActivitiesUseCase.class);
-        bind(ListActivitiesOutputBoundaryFactory.class)
-            .to(ListActivitiesOutputBoundaryFactoryImpl.class);
     }
 }

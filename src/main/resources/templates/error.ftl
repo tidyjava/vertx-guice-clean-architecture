@@ -5,8 +5,6 @@
     <title>Hello World!</title>
 </head>
 <body>
-<#list context.activities as activity>
-    ${activity.name}
-</#list>
+Something went wrong baby :(
 </body>
 </html>

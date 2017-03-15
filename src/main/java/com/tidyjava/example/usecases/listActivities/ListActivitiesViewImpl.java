@@ -3,6 +3,8 @@ package com.tidyjava.example.usecases.listActivities;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.templ.FreeMarkerTemplateEngine;
 
+import java.util.List;
+
 public class ListActivitiesViewImpl implements ListActivitiesView {
     private final RoutingContext ctx;
 
@@ -11,10 +13,10 @@ public class ListActivitiesViewImpl implements ListActivitiesView {
     }
 
     @Override
-    public void generate(ListActivitiesViewModel viewModel) {
-        final FreeMarkerTemplateEngine engine = FreeMarkerTemplateEngine.create();
+    public void generate(List<ActivityDetails> responseModel) {
+        FreeMarkerTemplateEngine engine = FreeMarkerTemplateEngine.create();
 
-        ctx.put("activities", viewModel.getViewableActivityDetails());
+        ctx.put("activities", responseModel);
 
         engine.render(ctx, "templates/index.ftl", res -> {
             if (res.succeeded()) {

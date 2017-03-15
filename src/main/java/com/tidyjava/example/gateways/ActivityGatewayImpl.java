@@ -1,16 +1,15 @@
 package com.tidyjava.example.gateways;
 
+import com.tidyjava.example.callback.Callback;
 import com.tidyjava.example.entities.Activity;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
-import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class ActivityGatewayImpl implements ActivityGateway {
     private final Vertx vertx;
@@ -21,7 +20,7 @@ public class ActivityGatewayImpl implements ActivityGateway {
     }
 
     @Override
-    public void findAll(Consumer<List<Activity>> consumer) {
+    public void findAll(Callback<List<Activity>> callback) {
         JsonObject config = new JsonObject()
                 .put("url", "jdbc:h2:mem:test")
                 .put("driver_class", "org.h2.Driver");
@@ -43,13 +42,14 @@ public class ActivityGatewayImpl implements ActivityGateway {
                             results.add(activity);
                         }
 
-                        consumer.accept(results);
+                        callback.success(results);
                     } else {
-                        throw new HolyMolyException();
+                        callback.failure(new HolyMolyException());
                     }
                 });
+                connection.close();
             } else {
-                throw new HolyMolyException();
+                callback.failure(new HolyMolyException());
             }
         });
     }
