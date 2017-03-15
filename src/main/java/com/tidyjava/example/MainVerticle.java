@@ -9,7 +9,6 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.templ.FreeMarkerTemplateEngine;
 
 public class MainVerticle extends AbstractVerticle {
 
