@@ -44,12 +44,12 @@ public class ActivityGatewayImpl implements ActivityGateway {
 
                         callback.success(results);
                     } else {
-                        callback.failure(new HolyMolyException());
+                        callback.failure(res2.cause());
                     }
                 });
                 connection.close();
             } else {
-                callback.failure(new HolyMolyException());
+                callback.failure(res.cause());
             }
         });
     }
