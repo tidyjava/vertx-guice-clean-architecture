@@ -17,7 +17,7 @@ public class ListActivitiesUseCase implements ListActivitiesInputBoundary {
     }
 
     @Override
-    public void listActivities(Callback<List<ActivityDetails>> presenter) {
+    public void listActivities(ListActivitiesOutputBoundary presenter) {
         activityGateway.findAll(Callback.of(
                 activities -> presenter.success(toResponseModel(activities)),
                 presenter::failure));

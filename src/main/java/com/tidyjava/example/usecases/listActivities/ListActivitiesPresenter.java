@@ -5,18 +5,18 @@ import io.vertx.ext.web.templ.FreeMarkerTemplateEngine;
 
 import java.util.List;
 
-public class ListActivitiesViewImpl implements ListActivitiesView {
+public class ListActivitiesPresenter implements ListActivitiesOutputBoundary {
     private final RoutingContext ctx;
 
-    public ListActivitiesViewImpl(RoutingContext ctx) {
+    public ListActivitiesPresenter(RoutingContext ctx) {
         this.ctx = ctx;
     }
 
     @Override
-    public void generate(List<ActivityDetails> responseModel) {
+    public void success(List<ActivityDetails> activityDetailsList) {
         FreeMarkerTemplateEngine engine = FreeMarkerTemplateEngine.create();
 
-        ctx.put("activities", responseModel);
+        ctx.put("activities", activityDetailsList);
 
         engine.render(ctx, "templates/index.ftl", res -> {
             if (res.succeeded()) {
@@ -25,5 +25,10 @@ public class ListActivitiesViewImpl implements ListActivitiesView {
                 ctx.fail(res.cause());
             }
         });
+    }
+
+    @Override
+    public void failure(Throwable throwable) {
+        ctx.fail(throwable);
     }
 }

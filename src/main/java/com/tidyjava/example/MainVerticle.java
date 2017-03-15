@@ -2,8 +2,10 @@ package com.tidyjava.example;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.tidyjava.example.callback.Callback;
-import com.tidyjava.example.usecases.listActivities.*;
+import com.tidyjava.example.usecases.listActivities.ListActivitiesInputBoundary;
+import com.tidyjava.example.usecases.listActivities.ListActivitiesModule;
+import com.tidyjava.example.usecases.listActivities.ListActivitiesUseCase;
+import com.tidyjava.example.usecases.listActivities.ListActivitiesPresenter;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
@@ -23,8 +25,8 @@ public class MainVerticle extends AbstractVerticle {
         final Router router = Router.router(vertx);
 
         router.get().handler(ctx -> {
-            ListActivitiesView listActivitiesView = new ListActivitiesViewImpl(ctx);
-            listActivitiesUseCase.listActivities(Callback.of(listActivitiesView::generate, ctx::fail));
+            ListActivitiesPresenter presenter = new ListActivitiesPresenter(ctx);
+            listActivitiesUseCase.listActivities(presenter);
         }).failureHandler(ctx -> {
             FreeMarkerTemplateEngine engine = FreeMarkerTemplateEngine.create();
 
