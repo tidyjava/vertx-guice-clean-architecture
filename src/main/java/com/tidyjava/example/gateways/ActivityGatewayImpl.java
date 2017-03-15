@@ -26,23 +26,24 @@ public class ActivityGatewayImpl implements ActivityGateway {
                 List<Activity> activities = asyncRs.result()
                         .getRows()
                         .stream()
-                        .map(this::toActivity).collect(Collectors.toList());
+                        .map(this::toActivity)
+                        .collect(Collectors.toList());
 
                 callback.success(activities);
             } else {
                 callback.failure(asyncRs.cause());
             }
-        }), callback);
+        }), callback::failure);
     }
 
-    private void getConnection(Consumer<SQLConnection> sqlConnectionConsumer, Callback<List<Activity>> callback) {
+    private void getConnection(Consumer<SQLConnection> sqlConnectionConsumer, Consumer<Throwable> onFailure) {
         jdbcClient.getConnection(asyncConn -> {
             if (asyncConn.succeeded()) {
                 SQLConnection connection = asyncConn.result();
                 sqlConnectionConsumer.accept(connection);
                 connection.close();
             } else {
-                callback.failure(asyncConn.cause());
+                onFailure.accept(asyncConn.cause());
             }
         });
     }
