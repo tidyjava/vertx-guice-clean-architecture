@@ -38,8 +38,8 @@ public class ActivityGatewayImpl implements ActivityGateway {
                         List<Activity> results = new ArrayList<>();
                         for (JsonObject row : rows) {
                             Activity activity = new Activity();
-                            activity.setId(row.getString("id"));
-                            activity.setName(row.getString("name"));
+                            activity.setId(row.getString("ID"));
+                            activity.setName(row.getString("NAME"));
                             results.add(activity);
                         }
 

@@ -5,6 +5,8 @@
     <title>Hello World!</title>
 </head>
 <body>
-Rendered text: ${context.name}
+<#list context.activities as activity>
+    ${activity}
+</#list>
 </body>
 </html>

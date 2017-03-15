@@ -11,10 +11,10 @@ public class ListActivitiesViewImpl implements ListActivitiesView {
     }
 
     @Override
-    public void generate(String temp) {
+    public void generate(ListActivitiesViewModel viewModel) {
         final FreeMarkerTemplateEngine engine = FreeMarkerTemplateEngine.create();
 
-        ctx.put("name", temp);
+        ctx.put("activities", viewModel.getViewableActivityDetails());
 
         engine.render(ctx, "templates/index.ftl", res -> {
             if (res.succeeded()) {
