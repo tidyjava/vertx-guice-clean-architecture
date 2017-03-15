@@ -20,26 +20,13 @@ public class MainVerticle extends AbstractVerticle {
         Injector injector = Guice.createInjector(new ActivityModule(vertx, config()));
         ListActivitiesInputBoundary listActivitiesUseCase = injector.getInstance(ListActivitiesUseCase.class);
 
-        Router router = Router.router(vertx);
-
-        router.get().handler(ctx -> {
+        Router.router(vertx).get("/").handler(ctx -> {
             ListActivitiesPresenter presenter = new ListActivitiesPresenter(ctx);
             listActivitiesUseCase.listActivities(presenter);
-        }).failureHandler(ctx -> {
-            FreeMarkerTemplateEngine engine = FreeMarkerTemplateEngine.create();
-
-            engine.render(ctx, "templates/error.ftl", res -> {
-                if (res.succeeded()) {
-                    ctx.response().end(res.result());
-                } else {
-                    System.out.println("DUPA");
-                    ctx.fail(res.cause());
-                }
-            });
         });
 
         vertx.createHttpServer()
-                .requestHandler(router::accept)
+                .requestHandler(Router.router(vertx)::accept)
                 .listen(8080);
     }
 
