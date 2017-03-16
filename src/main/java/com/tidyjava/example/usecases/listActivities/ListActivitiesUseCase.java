@@ -5,8 +5,8 @@ import com.tidyjava.example.entities.Activity;
 import com.tidyjava.example.gateways.ActivityGateway;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ListActivitiesUseCase implements ListActivitiesInputBoundary {
     private final ActivityGateway activityGateway;
@@ -24,11 +24,10 @@ public class ListActivitiesUseCase implements ListActivitiesInputBoundary {
     }
 
     private List<ActivityDetails> toResponseModel(List<Activity> activities) {
-        List<ActivityDetails> responseModel = new ArrayList<>();
-        for (Activity activity : activities) {
-            ActivityDetails activityDetails = new ActivityDetails(activity.getName());
-            responseModel.add(activityDetails);
-        }
-        return responseModel;
+        return activities
+                .stream()
+                .map(Activity::getName)
+                .map(ActivityDetails::new)
+                .collect(Collectors.toList());
     }
 }
