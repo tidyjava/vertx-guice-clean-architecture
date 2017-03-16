@@ -5,10 +5,10 @@ import io.vertx.ext.web.templ.FreeMarkerTemplateEngine;
 
 import java.util.List;
 
-public class ListActivitiesPresenter implements ListActivitiesOutputBoundary {
+public class ListActivitiesView implements ListActivitiesOutputBoundary {
     private final RoutingContext ctx;
 
-    public ListActivitiesPresenter(RoutingContext ctx) {
+    public ListActivitiesView(RoutingContext ctx) {
         this.ctx = ctx;
     }
 

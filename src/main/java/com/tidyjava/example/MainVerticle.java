@@ -3,8 +3,8 @@ package com.tidyjava.example;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.tidyjava.example.usecases.listActivities.ListActivitiesInputBoundary;
-import com.tidyjava.example.usecases.listActivities.ListActivitiesPresenter;
 import com.tidyjava.example.usecases.listActivities.ListActivitiesUseCase;
+import com.tidyjava.example.usecases.listActivities.ListActivitiesView;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.SQLConnection;
@@ -16,16 +16,17 @@ public class MainVerticle extends AbstractVerticle {
     public void start() {
         initDatabase();
 
+        Router router = Router.router(vertx);
         Injector injector = Guice.createInjector(new ActivityModule(vertx, config()));
-        ListActivitiesInputBoundary listActivitiesUseCase = injector.getInstance(ListActivitiesUseCase.class);
 
-        Router.router(vertx).get("/").handler(ctx -> {
-            ListActivitiesPresenter presenter = new ListActivitiesPresenter(ctx);
-            listActivitiesUseCase.listActivities(presenter);
+        ListActivitiesInputBoundary listActivitiesUseCase = injector.getInstance(ListActivitiesUseCase.class);
+        router.get().handler(ctx -> {
+            ListActivitiesView view = new ListActivitiesView(ctx);
+            listActivitiesUseCase.listActivities(view);
         });
 
         vertx.createHttpServer()
-                .requestHandler(Router.router(vertx)::accept)
+                .requestHandler(router::accept)
                 .listen(8080);
     }
 
