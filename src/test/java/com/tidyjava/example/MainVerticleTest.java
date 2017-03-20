@@ -1,6 +1,8 @@
 package com.tidyjava.example;
 
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -16,8 +18,11 @@ public class MainVerticleTest {
 
     @Before
     public void setUp(TestContext tc) {
+        JsonObject config = new JsonObject();
+        config.put("url", "jdbc:h2:mem:test");
+        config.put("driver_class", "org.h2.Driver");
         vertx = Vertx.vertx();
-        vertx.deployVerticle(MainVerticle.class.getName(), tc.asyncAssertSuccess());
+        vertx.deployVerticle(MainVerticle.class.getName(), new DeploymentOptions().setConfig(config), tc.asyncAssertSuccess());
     }
 
     @After

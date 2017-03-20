@@ -1,7 +1,7 @@
 package com.tidyjava.example.usecases.listActivities;
 
-import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.templ.FreeMarkerTemplateEngine;
+import io.vertx.rxjava.ext.web.RoutingContext;
+import io.vertx.rxjava.ext.web.templ.FreeMarkerTemplateEngine;
 
 import java.util.List;
 
