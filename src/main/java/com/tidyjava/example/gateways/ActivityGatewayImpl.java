@@ -1,14 +1,12 @@
 package com.tidyjava.example.gateways;
 
-import com.tidyjava.example.callback.Callback;
 import com.tidyjava.example.entities.Activity;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.jdbc.JDBCClient;
-import io.vertx.ext.sql.SQLConnection;
+import io.vertx.rxjava.ext.jdbc.JDBCClient;
+import rx.Single;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ActivityGatewayImpl implements ActivityGateway {
@@ -20,32 +18,14 @@ public class ActivityGatewayImpl implements ActivityGateway {
     }
 
     @Override
-    public void findAll(Callback<List<Activity>> callback) {
-        getConnection(connection -> connection.query("SELECT * FROM Activities;", asyncRs -> {
-            if (asyncRs.succeeded()) {
-                List<Activity> activities = asyncRs.result()
-                        .getRows()
-                        .stream()
-                        .map(this::toActivity)
-                        .collect(Collectors.toList());
-
-                callback.success(activities);
-            } else {
-                callback.failure(asyncRs.cause());
-            }
-        }), callback::failure);
-    }
-
-    private void getConnection(Consumer<SQLConnection> sqlConnectionConsumer, Consumer<Throwable> onFailure) {
-        jdbcClient.getConnection(asyncConn -> {
-            if (asyncConn.succeeded()) {
-                SQLConnection connection = asyncConn.result();
-                sqlConnectionConsumer.accept(connection);
-                connection.close();
-            } else {
-                onFailure.accept(asyncConn.cause());
-            }
-        });
+    public Single<List<Activity>> findAll() {
+        return jdbcClient.rxGetConnection()
+            .flatMap(connection -> connection.rxQuery("SELECT * FROM Activities;"))
+            .map(result -> result
+                .getRows()
+                .stream()
+                .map(this::toActivity)
+                .collect(Collectors.toList()));
     }
 
     private Activity toActivity(JsonObject row) {

@@ -5,9 +5,9 @@ import com.tidyjava.example.gateways.ActivityGateway;
 import com.tidyjava.example.gateways.ActivityGatewayImpl;
 import com.tidyjava.example.usecases.listActivities.ListActivitiesInputBoundary;
 import com.tidyjava.example.usecases.listActivities.ListActivitiesUseCase;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.jdbc.JDBCClient;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.ext.jdbc.JDBCClient;
 
 public class ActivityModule extends AbstractModule {
     private final Vertx vertx;
